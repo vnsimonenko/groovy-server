@@ -55,7 +55,7 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
     private String groovyScriptPath;
     private AtomicReference<String> groovyScript = new AtomicReference<>();
     private FileTime lastLastModifiedTimeForGroovy;
-    private boolean isActive; //признак завершения прослушивания сокетов клиентов
+    private boolean isActive; //indicator of active status of server
 
     /**
      * Host of server
