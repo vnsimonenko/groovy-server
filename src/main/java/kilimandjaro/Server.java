@@ -3,6 +3,8 @@ package kilimandjaro;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +38,11 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T> T type of handler for access, read, write by non-blocking sockets.
  */
 public class Server<T extends SocketHandler> implements AutoCloseable {
+    final static Logger logger = LoggerFactory.getLogger(Server.class);
+    //for static the fragment code not will be compiled
+    //although you can just call the method
+    final static public boolean DEBUG = true;
+
     private String host = "localhost";
     private int port = 8443;
     private int timeoutForSelector = 1000;
@@ -114,6 +121,7 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
      * @throws IOException
      */
     public void start() throws IOException {
+        logger.info("starting ...");
         ServerSocketChannel channel = ServerSocketChannel.open();
         channel.bind(new InetSocketAddress(host, port));
         channel.configureBlocking(false);
@@ -192,6 +200,7 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
                             socket.configureBlocking(false);
                             if (socketHandler.accept(socket)) {
                                 socket.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                                if (DEBUG) logger.debug("accept socket: " + socket.getRemoteAddress());
                             }
                         }
                         if (key.isReadable()) {
@@ -199,6 +208,10 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
                             if (bytes != null && bytes.length > 0) {
                                 key.attach(bytes);
                                 readingQueue.put(key);
+                                if (DEBUG) {
+                                    logger.debug("read socket: " + ((SocketChannel) key.channel()).socket()
+                                            .getRemoteSocketAddress());
+                                }
                             } else if (bytes == null) {
                                 continue;
                             }
@@ -210,6 +223,10 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
                             byte[] data = writtingQueue == null ? null : (byte[]) writtingQueue.poll();
                             if (data != null) {
                                 socketHandler.write(socketChannel, data);
+                                if (DEBUG) {
+                                    logger.debug("write socket: " + ((SocketChannel) key.channel()).socket()
+                                            .getRemoteSocketAddress());
+                                }
                             }
                         }
                     } catch (Exception ex) {
@@ -238,6 +255,7 @@ public class Server<T extends SocketHandler> implements AutoCloseable {
                 throw new IOException("reading size of file not equal in buffer");
             }
             groovyScript.set(new String(out.toByteArray(), "UTF-8"));
+            if (DEBUG) logger.debug("refresh groovy");
         }
     }
 
