@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>kilimandjaro</groupId>
-    <artifactId>proxy-router</artifactId>
+    <artifactId>groovy-server</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>groovy-router</name>
+    <name>groovy-server</name>
     <url>http://maven.apache.org</url>
 
     <properties>
