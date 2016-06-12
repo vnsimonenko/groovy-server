@@ -1,0 +1,40 @@
+<configuration>
+    <property resource="application.properties" />
+    <property name="LOG_HOME" value="${workspace}logs"/>
+    <property name="LOG_FILE_NAME" value="gtranslator.log"/>
+    <property name="LOG_SQL_FILE_NAME" value="sqlgtranslator.log"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_HOME}/${LOG_FILE_NAME}</file>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SQLFILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_HOME}/${LOG_SQL_FILE_NAME}</file>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.hibernate.SQL" additivity="false" >
+        <level value="DEBUG" />
+        <appender-ref ref="SQLFILE" />
+    </logger>
+
+    <logger name="org.hibernate.type" additivity="false" >
+        <level value="TRACE" />
+        <appender-ref ref="SQLFILE" />
+    </logger>
+
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
