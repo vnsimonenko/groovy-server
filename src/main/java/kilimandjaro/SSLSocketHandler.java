@@ -1,5 +1,8 @@
 package kilimandjaro;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -27,6 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  * SSL implementation {@link SocketHandler}
  */
 public class SSLSocketHandler implements SocketHandler {
+    final static Logger logger = LoggerFactory.getLogger(Server.class);
+
     private String keyStoreFilePath;
     private String trustStoreFilePath;
     private String password;
@@ -292,8 +297,8 @@ public class SSLSocketHandler implements SocketHandler {
                         peerNetData = handleBufferUnderflow(peerNetData);
                         break;
                     case CLOSED:
-                        shuttingDownSSLConnection(socketChannel);
-                        throw new ClosedChannelException();//"Received" + result.getStatus() + "during initial handshaking");
+                        logger.info("Received" + result.getStatus() + "during reading");
+                        throw new ClosedChannelException();
                     default:
                         throw new IllegalStateException("Invalid SSL status: " + result.getStatus());
                 }
@@ -328,8 +333,8 @@ public class SSLSocketHandler implements SocketHandler {
                 case BUFFER_OVERFLOW:
                 case BUFFER_UNDERFLOW:
                 case CLOSED:
-                    shuttingDownSSLConnection(socketChannel);
-                    throw new ClosedChannelException();//"Received" + result.getStatus() + "during initial handshaking");
+                    logger.info("Received" + result.getStatus() + "during writing");
+                    throw new ClosedChannelException();
                 default:
                     throw new IllegalStateException("Invalid SSL status: " + result.getStatus());
             }
